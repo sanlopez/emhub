@@ -298,6 +298,7 @@
         "definition": {
             "resources": [
                 "Krios01",
+                "Krios01",
                 "Arctica01",
                 "Talos"
             ],
@@ -718,8 +719,16 @@
             ],
             "title": "News Form"
         }
+    },
+    {
+      "name": "config:scipion",
+      "definition":
+        {
+            "scipion_path": "/home/irene/scipion3/scipion3",
+            "scipion_user_data_path": "/home/irene/ScipionUserData/projects"
+        }
     }
-],
+  ],
   
   "templates": [
       {"title": "EXTERNAL Application Form",
