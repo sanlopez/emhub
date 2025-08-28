@@ -35,8 +35,6 @@ from emhub.client import config
 from emhub.client.worker import (TaskHandler, DefaultTaskHandler, CmdTaskHandler,
                                  Worker)
 from emhub.client.session_worker import SessionTaskHandler, SessionWorker
-config_extended = configparser.ConfigParser()
-config_extended.read(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.yaml'))
 
 class TestSessionTaskHandler(TaskHandler):
     def __init__(self, *args, **kwargs):
@@ -111,8 +109,9 @@ class TestSessionTaskHandler(TaskHandler):
 
         if extra['otf']['otf_workflow'] == 'Scipion':
             scipion_workflow_template_path = extra['otf']['scipion_workflow']
-            scipion_path = config_extended['SCIPION'].get('SCIPION_PATH')
-            scipion_projects_path = config_extended['SCIPION'].get('SCIPION_USER_DATA_PATH')
+            scipion_config = self.request_config('scipion')
+            scipion_path = scipion_config['scipion_path']
+            scipion_projects_path = scipion_config['scipion_user_data_path']
 
             self.pl.system(f"{scipion_path} template {scipion_workflow_template_path} project_name={self.session['name']} \
                             moviesPath={raw_path} \
