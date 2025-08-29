@@ -55,12 +55,15 @@ class TestSessionTaskHandler(TaskHandler):
 
         return self._request(_update_extra, 'updating session extra')
 
+
     def process(self):
         try:
             if self.action == 'monitor':
                 return self.monitor()
             elif self.action == 'otf':
                 return self.otf()
+            elif self.action == 'copy_to_irods':
+                return self.copy_to_irods()
             raise Exception(f"Unknown action {self.action}")
         except Exception as e:
             self.update_task({'error': str(e), 'done': 1})
@@ -92,7 +95,8 @@ class TestSessionTaskHandler(TaskHandler):
             update_args['done'] = 1
 
         # Remove dict from the task update
-        del update_args['files']
+        if 'files' in update_args:
+            del update_args['files']
         self.update_task(update_args)
 
 
@@ -134,6 +138,40 @@ class TestSessionTaskHandler(TaskHandler):
             self.update_session_extra({'otf': otf})
             self.stop()
 
+
+    def copy_to_irods(self):
+        print("Trying to copy to iRODS...")
+        self.session = self.dc.get_session(self.session['id'])
+        extra = self.session['extra']
+        raw = extra['raw']
+        otf = extra['otf']
+        raw_path = raw.get('path', None)
+        otf_path = otf.get('path', None)
+
+        from copy_data import iRODSManager
+        im = iRODSManager()
+        irods_config = self.request_config('irods')
+        im.irods_zone = irods_config['irods_zone']
+        im.irods_host = irods_config['irods_host']
+        im.irods_user = irods_config['irods_user']
+        im.irods_port = irods_config['irods_port']
+        im.irods_pass = irods_config['irods_pass']
+        im.irods_parent_collection = irods_config['irods_parent_collection']
+
+        if raw_path:
+            print(f"Trying to copy raw data ({raw_path}) to iRODS...")
+            success, info = im.copy_data(f"{self.session['name']}_raw", raw_path)
+            if success:
+                raw.setdefault('irods', {})['linux'] = info['irods_retrieval_script_linux']
+                raw.setdefault('irods', {})['windows'] = info['irods_retrieval_script_windows']
+                self.update_session_extra({'raw': raw})
+        if otf_path:
+            print(f"Trying to copy OTF data ({otf_path}) to iRODS...")
+            success, info = im.copy_data(f"{self.session['name']}_otf", otf_path)
+            if success:
+                otf.setdefault('irods', {})['linux'] = info['irods_retrieval_script_linux']
+                otf.setdefault('irods', {})['windows'] = info['irods_retrieval_script_windows']
+                self.update_session_extra({'otf': otf})
 
 
 class TestSessionWorker(Worker):

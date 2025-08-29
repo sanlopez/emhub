@@ -152,6 +152,8 @@
             }
         }
 
+        attrs.tasks.push(['copy_to_irods', host])
+
         var ajaxContent = $.ajax({
             url: "{{ url_for('api.create_session_extended') }}",
             type: "POST",

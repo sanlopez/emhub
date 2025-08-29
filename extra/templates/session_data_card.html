@@ -25,6 +25,32 @@
                 </div>
             </div>
         </div> <!-- End of Data Card -->
+
+        {% set raw_irods = extra.get('raw', {}).get('irods', '') %}
+        {% set otf_irods = extra.get('otf', {}).get('irods', '') %}
+
+        {% if raw_irods or otf_irods %}
+            <div class="card"> <!-- Data Sharing Card -->
+                <div class="card-header">
+                    <h3 class="card-header-title"> Data Sharing</h3>
+                </div>
+                <h4 class="col-12 text-sm-left col-form-label ">More instructions on how to retrieve the data at this <a href="https://github.com/fjchichon/Guides/wiki/Download-RAWDATA-and-ScipionProject" class="badge badge-info mr-1 mt-1"> link</a></h4>
+                <div class="card-body">
+                    <table class="table table-striped table-bordered">
+                        <tbody>
+                            {{ macros.trow('Raw share command (linux)', raw_irods['linux']) }}
+                            {{ macros.trow('Raw share command (windows)', raw_irods['windows']) }}
+                            {{ macros.trow('OTF share command (linux)', otf_irods['linux']) }}
+                            {{ macros.trow('OTF share command (windows)', otf_irods['windows']) }}
+                        </tbody>
+                    </table>
+                     <div class="col-12">
+                        <div id="files-pie" class="col-12"></div>
+                    </div>
+                </div>
+            </div> <!-- End of Data Sharing Card -->
+        {% endif %}
+
     </div>
 
 <script>
