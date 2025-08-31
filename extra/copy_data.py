@@ -90,7 +90,7 @@ class iRODSManager():
         return False
 
 
-    def copy_data(self, collection_name, data_path):
+    def copy_data(self, collection_name, data_path, create_ticket=False):
         """
         Function that creates an iRODS collection from data provided
 
@@ -145,11 +145,12 @@ class iRODSManager():
                 session.acls.set(iRODSAccess('null', new_collection, 'anonymous'), recursive=True)
                 session.acls.set(iRODSAccess('null', new_collection, 'public'), recursive=True)
 
-                # create ticket for retrieving the data back
-                print(f'Creating ticket for project {collection_name}...')
-                new_ticket = Ticket(session)
-                ticket_id = new_ticket.issue(target=new_collection, permission='read').string
-                print(f'... ticket generated with id {ticket_id}...')
+                if create_ticket:
+                    # create ticket for retrieving the data back
+                    print(f'Creating ticket for project {collection_name}...')
+                    new_ticket = Ticket(session)
+                    ticket_id = new_ticket.issue(target=new_collection, permission='read').string
+                    print(f'... ticket generated with id {ticket_id}...')
                 success = True
 
             except Exception as e:
@@ -157,12 +158,13 @@ class iRODSManager():
 
         if success:
             info = {'irods_host': self.irods_host,
-                    'irods_location': new_collection,
-                    'irods_ticket_id': ticket_id,
-                    'irods_retrieval_script_linux': f'curl -sSfL "https://raw.githubusercontent.com/FragmentScreen/fandanGO-cryoem-cnb/main/cryoemcnb/utils/irods_fetch_unix.sh" | bash -s -- --host "{self.irods_host}" --collection "{new_collection}" --ticket "{ticket_id}"',
-                    'irods_retrieval_script_windows': f'$scriptPath = "$(Get-Location)\irods_fetch_win.ps1";\n'
-                                                      f'(Invoke-WebRequest -UseBasicParsing "https://raw.githubusercontent.com/FragmentScreen/fandanGO-cryoem-cnb/refs/heads/main/cryoemcnb/utils/irods_fetch_win.ps1").Content | Out-File $scriptPath -Encoding UTF8;\n'
-                                                      f'& powershell -ExecutionPolicy Bypass -File $scriptPath --host {self.irods_host} --collection "{new_collection}" --ticket "{ticket_id}";\n'
-                                                      f'Remove-Item $scriptPath'}
+                    'irods_location': new_collection}
+            if create_ticket:
+                info['irods_ticket_id'] = ticket_id,
+                info['irods_retrieval_script_linux'] = f'curl -sSfL "https://raw.githubusercontent.com/FragmentScreen/fandanGO-cryoem-cnb/main/cryoemcnb/utils/irods_fetch_unix.sh" | bash -s -- --host "{self.irods_host}" --collection "{new_collection}" --ticket "{ticket_id}"'
+                info['irods_retrieval_script_windows'] = f'$scriptPath = "$(Get-Location)\irods_fetch_win.ps1";\n'\
+                                                         f'(Invoke-WebRequest -UseBasicParsing "https://raw.githubusercontent.com/FragmentScreen/fandanGO-cryoem-cnb/refs/heads/main/cryoemcnb/utils/irods_fetch_win.ps1").Content | Out-File $scriptPath -Encoding UTF8;\n'\
+                                                         f'& powershell -ExecutionPolicy Bypass -File $scriptPath --host {self.irods_host} --collection "{new_collection}" --ticket "{ticket_id}";\n'\
+                                                         f'Remove-Item $scriptPath'
 
         return success, info

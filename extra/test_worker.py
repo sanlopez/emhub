@@ -71,23 +71,25 @@ class TestSessionTaskHandler(TaskHandler):
 
     def monitor(self):
         # update raw path
-        self.session['extra']['raw']['path'] = f"{os.path.join(self.session['acquisition']['raw_path'], self.session['name'])}"
-        extra = self.session['extra']
-        raw = extra['raw']
+        raw_path = f"{os.path.join(self.session['acquisition']['raw_path'], self.session['name'])}"
         acq = self.session['acquisition']
         repeat_until_date = datetime.fromisoformat(self.session['start']) + timedelta(days=3)
 
 
         print(Color.bold(f"session_id = {self.session['id']}, monitoring files..."))
-        print(f"    path: {raw['path']}")
+        print(f"    path: {raw_path}")
 
         if self.count == 1:
             self.mf = MovieFiles()
             self.mf._moviesSuffix.append(acq['images_pattern'])
 
-        self.mf.scan(raw['path'])
+        self.mf.scan(raw_path)
         update_args = self.mf.info()
+        # get updated session (to avoid inconsistencies with other task)
+        self.session = self.dc.get_session(self.session['id'])
+        raw = self.session['extra']['raw']
         raw.update(update_args)
+        raw.update({'path': raw_path})
         self.update_session_extra({'raw': raw})
 
         if datetime.now(timezone.utc) > repeat_until_date:
@@ -134,8 +136,10 @@ class TestSessionTaskHandler(TaskHandler):
                               'otf_status': otf['status'],
                               'count': self.count,
                               'done': 1})
-            self.update_session_extra({'raw': raw})
+
+            #self.update_session_extra({'raw': raw})
             self.update_session_extra({'otf': otf})
+
             self.stop()
 
 
@@ -160,15 +164,25 @@ class TestSessionTaskHandler(TaskHandler):
 
         if raw_path:
             print(f"Trying to copy raw data ({raw_path}) to iRODS...")
-            success, info = im.copy_data(f"{self.session['name']}_raw", raw_path)
-            if success:
+            create_ticket = False if (raw.get('irods', {}).get('linux', '') and raw.get('irods', {}).get('windows', '')) else True
+            print("...and WILL create ticket!") if create_ticket else print("...and WILL NOT create ticket!")
+            success, info = im.copy_data(f"{self.session['name']}_raw", raw_path, create_ticket=create_ticket)
+            if success and create_ticket:
+                # get updated session (to avoid inconsistencies with other task)
+                self.session = self.dc.get_session(self.session['id'])
+                raw = self.session['extra']['raw']
                 raw.setdefault('irods', {})['linux'] = info['irods_retrieval_script_linux']
                 raw.setdefault('irods', {})['windows'] = info['irods_retrieval_script_windows']
                 self.update_session_extra({'raw': raw})
         if otf_path:
             print(f"Trying to copy OTF data ({otf_path}) to iRODS...")
-            success, info = im.copy_data(f"{self.session['name']}_otf", otf_path)
-            if success:
+            create_ticket = False if (otf.get('irods', {}).get('linux', '') and otf.get('irods', {}).get('windows', '')) else True
+            print("...and WILL create ticket!") if create_ticket else print("...and WILL NOT create ticket!")
+            success, info = im.copy_data(f"{self.session['name']}_otf", otf_path, create_ticket=create_ticket)
+            if success and create_ticket:
+                # get updated session (to avoid inconsistencies with other task)
+                self.session = self.dc.get_session(self.session['id'])
+                otf = self.session['extra']['otf']
                 otf.setdefault('irods', {})['linux'] = info['irods_retrieval_script_linux']
                 otf.setdefault('irods', {})['windows'] = info['irods_retrieval_script_windows']
                 self.update_session_extra({'otf': otf})
