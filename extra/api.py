@@ -2,6 +2,7 @@
 def extend_api(api_bp):
 
     import flask_login
+    from flask import render_template
     from flask import current_app as app
 
     from emhub.blueprints.api import handle_session
@@ -58,3 +59,43 @@ def extend_api(api_bp):
             return session
 
         return handle_session(_create_session_extended)
+
+
+    @api_bp.route('/send_data_sharing_mail', methods=['POST'])
+    @flask_login.login_required
+    def send_data_sharing_mail():
+        def _send_data_sharing_mail(**args):
+            session = app.dm.get_session_by(id=args['session_id'])
+            extra = dict(session.extra)
+            booking = app.dm.get_booking_by(id=session.booking_id)
+
+            if booking:
+                user = app.dm.get_user_by(email=booking.owner.email)
+
+                raw = extra['raw']
+                if raw.get('irods', {}).get('linux', '') and raw.get('irods', {}).get('windows', ''):
+                    app.mm.send_mail(
+                        [booking.owner.email],
+                        f"emhub: Download your the raw data of your session {session.name}",
+                        render_template('email/download_data.txt',
+                                        user=user,
+                                        session=session.name,
+                                        data_type='raw',
+                                        linux_cmd=raw['irods']['linux'],
+                                        windows_cmd=raw['irods']['windows']))
+
+                otf = extra['otf']
+                if otf.get('irods', {}).get('linux', '') and otf.get('irods', {}).get('windows', ''):
+                    app.mm.send_mail(
+                        [booking.owner.email],
+                        f"emhub: Download your the Scipion data of your session {session.name}",
+                        render_template('email/download_data.txt',
+                                        user=user,
+                                        session=session.name,
+                                        data_type='Scipion',
+                                        linux_cmd=otf['irods']['linux'],
+                                        windows_cmd=otf['irods']['windows']))
+
+            return session
+
+        return handle_session(_send_data_sharing_mail)

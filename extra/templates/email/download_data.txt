@@ -1,0 +1,20 @@
+
+Dear {{ user.name }},
+
+To download the {{ data_type }} data of the session {{ session }} follow the instructions of the link:
+
+https://github.com/fjchichon/Guides/wiki/Download-RAWDATA-and-ScipionProject
+
+Where the command for linux machines is:
+
+{{ linux_cmd }}
+
+and for windows machines is:
+
+{{ windows_cmd }}
+
+If you face any problem do not hesitate on contacting us.
+
+Sincerely,
+
+The CNB CryoEM Facility Staff
