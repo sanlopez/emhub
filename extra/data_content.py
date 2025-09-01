@@ -40,3 +40,7 @@ def register_content(dc):
         }
         data.update(dc.get_user_projects(b.owner, status='active'))
         return data
+
+    @dc.content
+    def user_reset_password(**kwargs):
+        return ''
