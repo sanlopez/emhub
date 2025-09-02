@@ -265,6 +265,7 @@ function createCalender() {
           center: 'title',
           right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
+        firstDay: 1,
         editable: true,
         droppable: true, // this allows things to be dropped onto the calendar
         selectable: true, // allows to select dates
