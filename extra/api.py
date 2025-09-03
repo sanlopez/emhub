@@ -30,8 +30,8 @@ def extend_api(api_bp):
                 from datetime import date
                 today = date.today()
                 session_name = f'{today.year}_{today.month}_{today.day}_{b.owner.name.replace(" ", "_")}'
-                n_sessions_owned_today = app.dm.get_sessions(condition=f'name LIKE "{session_name}%"')
-                session_name = f'{session_name}_{len(n_sessions_owned_today) + 1}'
+                n_sessions = app.dm.get_sessions()
+                session_name = f'{session_name}_{len(n_sessions) + 1}'
                 args['name'] = session_name
 
             s = app.dm.get_session_by(name=args['name'])
