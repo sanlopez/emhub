@@ -260,7 +260,7 @@ def create_data_models(dm):
             token = jwt.encode(
                 {'reset_password': self.id,
                  'exp': dm.now() + dt.timedelta(seconds=expires_in)},
-                app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
+                app.config['SECRET_KEY'], algorithm='HS256')
             self.reset_token = token
 
             return token
