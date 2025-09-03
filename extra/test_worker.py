@@ -73,8 +73,8 @@ class TestSessionTaskHandler(TaskHandler):
         # update raw path
         raw_path = f"{os.path.join(self.session['acquisition']['raw_path'], self.session['name'])}"
         acq = self.session['acquisition']
-        repeat_until_date = datetime.fromisoformat(self.session['start']) + timedelta(days=3)
-
+        # get task alive for 7 days
+        repeat_until_date = datetime.fromisoformat(self.session['start']) + timedelta(days=7)
 
         print(Color.bold(f"session_id = {self.session['id']}, monitoring files..."))
         print(f"    path: {raw_path}")
@@ -144,6 +144,8 @@ class TestSessionTaskHandler(TaskHandler):
 
 
     def copy_to_irods(self):
+        # get task alive for 7 days
+        repeat_until_date = datetime.fromisoformat(self.session['start']) + timedelta(days=7)
         print("Trying to copy to iRODS...")
         self.session = self.dc.get_session(self.session['id'])
         extra = self.session['extra']
@@ -187,6 +189,10 @@ class TestSessionTaskHandler(TaskHandler):
                 otf.setdefault('irods', {})['windows'] = info['irods_retrieval_script_windows']
                 self.update_session_extra({'otf': otf})
 
+
+        if datetime.now(timezone.utc) > repeat_until_date:
+            self.stop()
+            self.update_task({'done': 1})
 
 class TestSessionWorker(Worker):
     def handle_tasks(self, tasks):
