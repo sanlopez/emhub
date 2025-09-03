@@ -36,7 +36,7 @@ from emhub.client.worker import (TaskHandler, DefaultTaskHandler, CmdTaskHandler
                                  Worker)
 from emhub.client.session_worker import SessionTaskHandler, SessionWorker
 
-class TestSessionTaskHandler(TaskHandler):
+class CNBSessionTaskHandler(TaskHandler):
     def __init__(self, *args, **kwargs):
         TaskHandler.__init__(self, *args, **kwargs)
         targs = self.task['args']
@@ -57,17 +57,17 @@ class TestSessionTaskHandler(TaskHandler):
 
 
     def process(self):
-        try:
-            if self.action == 'monitor':
-                return self.monitor()
-            elif self.action == 'otf':
-                return self.otf()
-            elif self.action == 'copy_to_irods':
-                return self.copy_to_irods()
-            raise Exception(f"Unknown action {self.action}")
-        except Exception as e:
-            self.update_task({'error': str(e), 'done': 1})
-            self.stop()
+        # try:
+        if self.action == 'monitor':
+            return self.monitor()
+        elif self.action == 'otf':
+            return self.otf()
+        elif self.action == 'copy_to_irods':
+            return self.copy_to_irods()
+        raise Exception(f"Unknown action {self.action}")
+        # except Exception as e:
+        #     self.update_task({'error': str(e), 'done': 1})
+        #     self.stop()
 
     def monitor(self):
         # update raw path
@@ -194,20 +194,20 @@ class TestSessionTaskHandler(TaskHandler):
             self.stop()
             self.update_task({'done': 1})
 
-class TestSessionWorker(Worker):
+class CNBSessionWorker(Worker):
     def handle_tasks(self, tasks):
         for t in tasks:
             if t['name'] == 'command':
                 handler = CmdTaskHandler(self, t)
             elif t['name'] == 'session':
-                handler = TestSessionTaskHandler(self, t)
+                handler = CNBSessionTaskHandler(self, t)
             else:
                 handler = DefaultTaskHandler(self, t)
             handler.start()
 
 
 if __name__ == '__main__':
-    worker = TestSessionWorker(debug=True)
+    worker = CNBSessionWorker(debug=True)
     worker.run()
 
 
