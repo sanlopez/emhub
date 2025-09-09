@@ -120,7 +120,8 @@ def extend_api(api_bp):
                 extra={'laboratory': attrs['laboratory'],
                        'project_nickname': attrs['project_nickname'],
                        'funding_account': attrs['funding_account'],
-                       'funding_eu': attrs['funding_eu']}
+                       'funding_eu': attrs['funding_eu'],
+                       'collaborators': attrs['collaborators']}
             )
 
             if app.mm:
@@ -135,10 +136,8 @@ def extend_api(api_bp):
     @api_bp.route('/update_user_form_extended', methods=['POST'])
     @flask_login.login_required
     def update_user_form_extended():
-        print("estioy en UDPATE_USER_FORM_EXTENDEEEEEEED")
         try:
             f = request.form
-
             attrs = {'id': f['user-id'],
                      'name': f['user-name'],
                      'phone': f['user-phone'],
@@ -146,7 +145,8 @@ def extend_api(api_bp):
                      'extra': {'laboratory': f['laboratory-name'],
                                'project_nickname': f['project-nickname'],
                                'funding_account': f['funding-account'],
-                               'funding_eu': f['funding-eu'] == "true"}
+                               'funding_eu': f['funding-eu'] == "true",
+                               'collaborators': f['collaborators']}
                      }
 
             roles = [v.replace('role-', '') for v in f if v.startswith('role-')]

@@ -160,6 +160,63 @@
                             </label>
                         </div>
                     </div>
+
+
+                    <!-- Collaborators table -->
+                    <div class="form-group row">
+                            <label class="col-12 col-sm-3 col-form-label text-sm-right">Collaborators</label>
+                            <div class="col-12 col-sm-8 col-lg-6">
+                                <div class="tab-pane fade active show" id="Collaborators-t" role="tabpanel" aria-labelledby="Collaborators-t-tab">
+                                    <div class="form-group row">
+                                            <div class="col-12">
+                                            <div class="row mb-2">
+                                                <div class="col-12">
+                                                    <div class="row">
+                                                        <div><a class="btn btn-sm btn-outline-light ml-3" href="javascript:table_addRow('collaborators')"><i class="fas fa-plus-circle"></i>   </a></div>
+                                                        <div><a class="btn btn-sm btn-outline-light ml-3" href="javascript:table_copyRows('collaborators')"><i class="fas fa-copy"></i>   </a></div>
+                                                        <div><a class="btn btn-sm btn-outline-light ml-3" href="javascript:table_deleteRows('collaborators')"><i class="fas fa-trash-alt"></i> </a></div>
+                                                        <div><a class="btn btn-sm btn-outline-light ml-3" href="javascript:table_rowsToClipboard('collaborators')"><i class="fas fa-clipboard-list"></i> </a></div>
+                                                        <div><a class="btn btn-sm btn-outline-light ml-3" href="javascript:table_clipboardToRows('collaborators')"><i class="fas fa-clipboard-check"></i> </a></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="table-responsive">
+                                                <table class="table" id="collaborators" name="collaborators">
+                                                    <thead class="bg-light">
+                                                        <tr class="border-0">
+                                                            <th class="border-0"></th>
+                                                            <th class="border-0 column-name">Name</th>
+                                                            <th class="border-0 column-name">Email</th>
+                                                            <th class="border-0 column-name">Phone</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody name="table-body" data-nextid="0">
+                                                        <tr id="collaborators-ROW-TEMPLATE" style="display: none;">
+                                                            <td>
+                                                                <label class="be-checkbox custom-control custom-checkbox">
+                                                                    <input type="checkbox" class="custom-control-input row-checkbox"><span class="custom-control-label"></span>
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <textarea required="" class="form-control" rows="5" style="min-width: 250px;" data-key="name"></textarea>
+                                                            </td>
+                                                            <td>
+                                                                <textarea required="" class="form-control" rows="5" style="min-width: 250px;" data-key="email"></textarea>
+                                                            </td>
+                                                            <td>
+                                                                <textarea required="" class="form-control" rows="5" style="min-width: 250px;" data-key="phone"></textarea>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
             </div>
 
                 </div>
@@ -233,6 +290,33 @@
       }
     });
 
+    function renderCollaborators(collaborators) {
+
+        if (!Array.isArray(collaborators)) {
+            console.warn("No collaborators to render");
+            return;
+        }
+
+        var $tbody = $("#collaborators tbody");
+        var $template = $("#collaborators-ROW-TEMPLATE");
+
+        $tbody.find("tr").not($template).remove();
+
+        collaborators.forEach(function(c) {
+            var $row = $template.clone();
+            $row.removeAttr("id").show();
+
+            $row.find("textarea[data-key='name']").val(c.name || "");
+            $row.find("textarea[data-key='email']").val(c.email || "");
+            $row.find("textarea[data-key='phone']").val(c.phone || "");
+
+            $tbody.append($row);
+        });
+    }
+
+    const existingCollaborators = {{ user.extra.collaborators | default([]) | tojson | safe }};
+    renderCollaborators(JSON.parse(existingCollaborators));
+
 })(window, document, window.jQuery);
 
 
@@ -289,6 +373,24 @@ function onUserOkButtonClick() {
         showMessage('ERROR', 'Password can not contains spaces');
         return;
     }
+
+    var collaborators = [];
+    $("#collaborators tbody tr").each(function() {
+        if ($(this).attr("id") === "collaborators-ROW-TEMPLATE") return;
+
+        var collaborator = {};
+        $(this).find("textarea").each(function() {
+            var key = $(this).data("key");   // name, email, phone
+            var value = $(this).val().trim();
+            collaborator[key] = value;
+        });
+
+        if (Object.values(collaborator).some(v => v !== "")) {
+            collaborators.push(collaborator);
+        }
+    });
+
+    formData.set("collaborators", JSON.stringify(collaborators));
 
     var ajaxContent = $.ajax({
         url: "{{ url_for('api.update_user_form_extended') }}",

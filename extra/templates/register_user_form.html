@@ -16,105 +16,160 @@
             <form id="register-user-form" data-parsley-validate="" novalidate="">
             <div class="row">
 
-            <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
+                <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10 col-10">
 
-                    <!-- Email Row -->
-                    <div class="form-group row">
-                        <label class="col-12 col-sm-3 col-form-label text-sm-right">Email</label>
-                        <div class="col-12 col-sm-8 col-lg-6">
-                            <input type="text" required="" placeholder="Enter email" id="user-email" name="user-email" class="form-control">
+                        <!-- Email Row -->
+                        <div class="form-group row">
+                            <label class="col-12 col-sm-3 col-form-label text-sm-right">Email</label>
+                            <div class="col-12 col-sm-8 col-lg-6">
+                                <input type="text" required="" placeholder="Enter email" id="user-email" name="user-email" class="form-control">
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Name Row -->
-                    <div class="form-group row">
-                        <label class="col-12 col-sm-3 col-form-label text-sm-right">Name</label>
-                        <div class="col-12 col-sm-8 col-lg-6">
-                            <input type="text" required="" placeholder="Enter username" id="user-name" name="user-name" class="form-control">
+                        <!-- Name Row -->
+                        <div class="form-group row">
+                            <label class="col-12 col-sm-3 col-form-label text-sm-right">Name</label>
+                            <div class="col-12 col-sm-8 col-lg-6">
+                                <input type="text" required="" placeholder="Enter username" id="user-name" name="user-name" class="form-control">
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Phone Row -->
-                    <div class="form-group row">
-                        <label class="col-12 col-sm-3 col-form-label text-sm-right">Phone</label>
-                        <div class="col-12 col-sm-8 col-lg-6">
-                            <input type="text" required="" placeholder="Enter phone" id="user-phone" name="user-phone" class="form-control">
+                        <!-- Phone Row -->
+                        <div class="form-group row">
+                            <label class="col-12 col-sm-3 col-form-label text-sm-right">Phone</label>
+                            <div class="col-12 col-sm-8 col-lg-6">
+                                <input type="text" required="" placeholder="Enter phone" id="user-phone" name="user-phone" class="form-control">
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Roles -->
-                    <div class="form-group row">
-                        <label class="col-12 col-sm-3 col-form-label text-sm-right">Roles</label>
+                        <!-- Roles -->
+                        <div class="form-group row">
+                            <label class="col-12 col-sm-3 col-form-label text-sm-right">Roles</label>
 
-                        <div class="col-12 col-sm-8 col-lg-6">
-                            {% for role in roles %}
-                                <label class="custom-control custom-checkbox custom-control-inline">
-                                    <input type="checkbox" name="role-{{ role }}" class="custom-control-input user-role">
-                                    <span class="custom-control-label">{{ role }}</span>
-                                </label>
-                            {% endfor %}
-                        </div>
-                    </div>
-
-                    <!-- PI -->
-                    <div class="form-group row">
-                        <label class="col-12 col-sm-3 col-form-label text-sm-right">PI</label>
-                        <div class="col-12 col-sm-8 col-lg-6">
-                            {% if possible_pis %}
-                                <select id="user-pi-select" name="user-pi-select" class="selectpicker show-tick" data-width="100%" data-live-search="true">
-                                <option value=""></option>
-                                {% for pi in possible_pis %}
-                                    <option value="{{pi['id']}}">{{pi['name']}}</option>
+                            <div class="col-12 col-sm-8 col-lg-6">
+                                {% for role in roles %}
+                                    <label class="custom-control custom-checkbox custom-control-inline">
+                                        <input type="checkbox" name="role-{{ role }}" class="custom-control-input user-role">
+                                        <span class="custom-control-label">{{ role }}</span>
+                                    </label>
                                 {% endfor %}
-                                </select>
-                            {% else %}
-                                <input type="text" id="user-pi-text" class="form-control" value="{{ pi_label }}" readonly>
-                            {% endif %}
+                            </div>
                         </div>
-                    </div>
 
-
-                    <!-- Laboratory/Group Row -->
-                    <div class="form-group row">
-                        <label class="col-12 col-sm-3 col-form-label text-sm-right">Laboratory / Group</label>
-                        <div class="col-12 col-sm-8 col-lg-6">
-                            <input type="text" required="" placeholder="Enter laboratory/group name" id="laboratory-name" name="laboratory-name" class="form-control">
+                        <!-- PI -->
+                        <div class="form-group row">
+                            <label class="col-12 col-sm-3 col-form-label text-sm-right">PI</label>
+                            <div class="col-12 col-sm-8 col-lg-6">
+                                {% if possible_pis %}
+                                    <select id="user-pi-select" name="user-pi-select" class="selectpicker show-tick" data-width="100%" data-live-search="true">
+                                    <option value=""></option>
+                                    {% for pi in possible_pis %}
+                                        <option value="{{pi['id']}}">{{pi['name']}}</option>
+                                    {% endfor %}
+                                    </select>
+                                {% else %}
+                                    <input type="text" id="user-pi-text" class="form-control" value="{{ pi_label }}" readonly>
+                                {% endif %}
+                            </div>
                         </div>
-                    </div>
 
 
-                    <!-- Project nickname Row -->
-                    <div class="form-group row">
-                        <label class="col-12 col-sm-3 col-form-label text-sm-right">Project nickname</label>
-                        <div class="col-12 col-sm-8 col-lg-6">
-                            <input type="text" required="" placeholder="Enter project nickname" id="project-nickname" name="project-nickname" class="form-control">
+                        <!-- Laboratory/Group Row -->
+                        <div class="form-group row">
+                            <label class="col-12 col-sm-3 col-form-label text-sm-right">Laboratory / Group</label>
+                            <div class="col-12 col-sm-8 col-lg-6">
+                                <input type="text" required="" placeholder="Enter laboratory/group name" id="laboratory-name" name="laboratory-name" class="form-control">
+                            </div>
                         </div>
-                    </div>
 
 
-                    <!-- Account/Cost center funding Row -->
-                    <div class="form-group row">
-                        <label class="col-12 col-sm-3 col-form-label text-sm-right">Account / Cost center</label>
-                        <div class="col-12 col-sm-8 col-lg-6">
-                            <input type="text" required="" placeholder="Enter account/cost center" id="funding-account" name="funding-account" class="form-control">
+                        <!-- Project nickname Row -->
+                        <div class="form-group row">
+                            <label class="col-12 col-sm-3 col-form-label text-sm-right">Project nickname</label>
+                            <div class="col-12 col-sm-8 col-lg-6">
+                                <input type="text" required="" placeholder="Enter project nickname" id="project-nickname" name="project-nickname" class="form-control">
+                            </div>
                         </div>
-                    </div>
 
 
-                    <!-- H2020/EU-funded Row -->
-                    <div class="form-group row">
-                        <label class="col-12 col-sm-3 col-form-label text-sm-right">H2020 / EU-funded</label>
-                        <div class="col-12 col-sm-8 col-lg-6">
-                            <label class="custom-control custom-checkbox custom-control-inline">
-                                <input type="checkbox" name="funding-eu" class="custom-control-input funding-eu">
-                                <span class="custom-control-label"></span>
-                            </label>
+                        <!-- Account/Cost center funding Row -->
+                        <div class="form-group row">
+                            <label class="col-12 col-sm-3 col-form-label text-sm-right">Account / Cost center</label>
+                            <div class="col-12 col-sm-8 col-lg-6">
+                                <input type="text" required="" placeholder="Enter account/cost center" id="funding-account" name="funding-account" class="form-control">
+                            </div>
                         </div>
-                    </div>
+
+
+                        <!-- H2020/EU-funded Row -->
+                        <div class="form-group row">
+                            <label class="col-12 col-sm-3 col-form-label text-sm-right">H2020 / EU-funded</label>
+                            <div class="col-12 col-sm-8 col-lg-6">
+                                <label class="custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" name="funding-eu" class="custom-control-input funding-eu">
+                                    <span class="custom-control-label"></span>
+                                </label>
+                            </div>
+                        </div>
+
+
+                        <!-- Collaborators table -->
+                        <div class="form-group row">
+                            <label class="col-12 col-sm-3 col-form-label text-sm-right">Collaborators</label>
+                            <div class="col-12 col-sm-8 col-lg-6">
+                                <div class="tab-pane fade active show" id="Collaborators-t" role="tabpanel" aria-labelledby="Collaborators-t-tab">
+                                    <div class="form-group row">
+                                            <div class="col-12">
+                                            <div class="row mb-2">
+                                                <div class="col-12">
+                                                    <div class="row">
+                                                        <div><a class="btn btn-sm btn-outline-light ml-3" href="javascript:table_addRow('collaborators')"><i class="fas fa-plus-circle"></i>   </a></div>
+                                                        <div><a class="btn btn-sm btn-outline-light ml-3" href="javascript:table_copyRows('collaborators')"><i class="fas fa-copy"></i>   </a></div>
+                                                        <div><a class="btn btn-sm btn-outline-light ml-3" href="javascript:table_deleteRows('collaborators')"><i class="fas fa-trash-alt"></i> </a></div>
+                                                        <div><a class="btn btn-sm btn-outline-light ml-3" href="javascript:table_rowsToClipboard('collaborators')"><i class="fas fa-clipboard-list"></i> </a></div>
+                                                        <div><a class="btn btn-sm btn-outline-light ml-3" href="javascript:table_clipboardToRows('collaborators')"><i class="fas fa-clipboard-check"></i> </a></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="table-responsive">
+                                                <table class="table" id="collaborators" name="collaborators">
+                                                    <thead class="bg-light">
+                                                        <tr class="border-0">
+                                                            <th class="border-0"></th>
+                                                            <th class="border-0 column-name">Name</th>
+                                                            <th class="border-0 column-name">Email</th>
+                                                            <th class="border-0 column-name">Phone</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody name="table-body" data-nextid="0">
+                                                        <tr id="collaborators-ROW-TEMPLATE" style="display: none;">
+                                                            <td>
+                                                                <label class="be-checkbox custom-control custom-checkbox">
+                                                                    <input type="checkbox" class="custom-control-input row-checkbox"><span class="custom-control-label"></span>
+                                                                </label>
+                                                            </td>
+                                                            <td>
+                                                                <textarea required="" class="form-control" rows="5" style="min-width: 250px;" data-key="name"></textarea>
+                                                            </td>
+                                                            <td>
+                                                                <textarea required="" class="form-control" rows="5" style="min-width: 250px;" data-key="email"></textarea>
+                                                            </td>
+                                                            <td>
+                                                                <textarea required="" class="form-control" rows="5" style="min-width: 250px;" data-key="phone"></textarea>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </div>
 
             </div>
-
-                </div>
             </form>
 
         <!-- end User Form -->
@@ -137,6 +192,22 @@ function onRegisterUserExtended() {
         roles.push(this.name.replace('role-', ''));
     });
 
+    var collaborators = [];
+    $("#collaborators tbody tr").each(function() {
+        if ($(this).attr("id") === "collaborators-ROW-TEMPLATE") return;
+
+        var collaborator = {};
+        $(this).find("textarea").each(function() {
+            var key = $(this).data("key");   // name, email, phone
+            var value = $(this).val().trim();
+            collaborator[key] = value;
+        });
+
+        if (Object.values(collaborator).some(v => v !== "")) {
+            collaborators.push(collaborator);
+        }
+    });
+
     var user = {
         email: $('#user-email').val(),
         name: $('#user-name').val(),
@@ -145,7 +216,8 @@ function onRegisterUserExtended() {
         laboratory: $('#laboratory-name').val(),
         project_nickname: $('#project-nickname').val(),
         funding_account: $('#funding-account').val(),
-        funding_eu: document.querySelector('.funding-eu').checked
+        funding_eu: document.querySelector('.funding-eu').checked,
+        collaborators: collaborators
     };
 
     send_ajax_json("{{ url_for('api.register_user_extended') }}", user, handleUserAjaxDone);
