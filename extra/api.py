@@ -2,10 +2,12 @@
 def extend_api(api_bp):
 
     import flask_login
-    from flask import render_template
+    from flask import render_template, request
     from flask import current_app as app
+    import os
 
-    from emhub.blueprints.api import handle_session
+    from emhub.blueprints.api import handle_session, handle_user
+    from emhub.utils import send_json_data, send_error
 
     @api_bp.route('/create_session_extended', methods=['POST'])
     @flask_login.login_required
@@ -99,3 +101,88 @@ def extend_api(api_bp):
             return session
 
         return handle_session(_send_data_sharing_mail)
+
+
+    @api_bp.route('/register_user_extended', methods=['POST'])
+    @flask_login.login_required
+    def register_user_extended():
+        def _register_user_extended(**attrs):
+            email = attrs['email'].strip()
+            user = app.dm.create_user(
+                username=email,
+                email=email,
+                phone='',
+                password=os.urandom(24).hex(),
+                name=attrs['name'],
+                roles=attrs['roles'],
+                pi_id=attrs['pi_id'],
+                status='active',
+                extra={'laboratory': attrs['laboratory'],
+                       'project_nickname': attrs['project_nickname'],
+                       'funding_account': attrs['funding_account'],
+                       'funding_eu': attrs['funding_eu']}
+            )
+
+            if app.mm:
+                app.mm.send_mail(
+                    [user.email],
+                    "emhub: New account registered",
+                    render_template('email/account_registered.txt', user=user))
+            return user
+
+        return handle_user(_register_user_extended)
+
+    @api_bp.route('/update_user_form_extended', methods=['POST'])
+    @flask_login.login_required
+    def update_user_form_extended():
+        print("estioy en UDPATE_USER_FORM_EXTENDEEEEEEED")
+        try:
+            f = request.form
+
+            attrs = {'id': f['user-id'],
+                     'name': f['user-name'],
+                     'phone': f['user-phone'],
+                     'status': f['user-status-select'],
+                     'extra': {'laboratory': f['laboratory-name'],
+                               'project_nickname': f['project-nickname'],
+                               'funding_account': f['funding-account'],
+                               'funding_eu': f['funding-eu'] == "true"}
+                     }
+
+            roles = [v.replace('role-', '') for v in f if v.startswith('role-')]
+            if roles:
+                attrs['roles'] = roles
+
+            if 'user-pi-select' in f:
+                pi_id = int(f['user-pi-select'])
+                if pi_id:
+                    attrs['pi_id'] = pi_id
+                # TODO: Validate if a user is not longer PI
+                # check that there are not other users referencing this one as pi
+                # still this will not be a very common case
+
+            password = f['user-password'].strip()
+            if password:
+                attrs['password'] = password
+
+            if 'user-profile-image' in request.files:
+                profile_image = request.files['user-profile-image']
+
+                if profile_image.filename:
+                    _, ext = os.path.splitext(profile_image.filename)
+
+                    if ext.lstrip(".").upper() not in app.config["ALLOWED_IMAGE_EXTENSIONS"]:
+                        return send_error("Image format %s is not allowed!" % ext.upper())
+                    else:
+                        image_name = 'profile-image-%06d%s' % (int(f['user-id']), ext)
+                        image_path = os.path.join(app.config['USER_IMAGES'], image_name)
+                        profile_image.save(image_path)
+                        attrs['profile_image'] = image_name
+
+            app.dm.update_user(**attrs)
+
+            return send_json_data({'user': attrs})
+
+        except Exception as e:
+            print(e)
+            return send_error('ERROR from Server: %s' % e)

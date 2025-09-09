@@ -125,6 +125,41 @@
                             {% endif %}
                         </div>
                     </div>
+
+                    <!-- Laboratory/Group Row -->
+                    <div class="form-group row">
+                        <label class="col-12 col-sm-3 col-form-label text-sm-right">Laboratory / Group</label>
+                        <div class="col-12 col-sm-8 col-lg-6">
+                            <input type="text" required="" placeholder="Enter laboratory/group name" id="laboratory-name" name="laboratory-name" class="form-control" value="{{ user.extra.laboratory }}">
+                        </div>
+                    </div>
+
+                    <!-- Project nickname Row -->
+                    <div class="form-group row">
+                        <label class="col-12 col-sm-3 col-form-label text-sm-right">Project nickname</label>
+                        <div class="col-12 col-sm-8 col-lg-6">
+                            <input type="text" required="" placeholder="Enter project nickname" id="project-nickname" name="project-nickname" class="form-control" value="{{ user.extra.project_nickname }}">
+                        </div>
+                    </div>
+
+                    <!-- Account/Cost center funding Row -->
+                    <div class="form-group row">
+                        <label class="col-12 col-sm-3 col-form-label text-sm-right">Account / Cost center</label>
+                        <div class="col-12 col-sm-8 col-lg-6">
+                            <input type="text" required="" placeholder="Enter account/cost center" id="funding-account" name="funding-account" class="form-control" value="{{ user.extra.funding_account }}">
+                        </div>
+                    </div>
+
+                    <!-- H2020/EU-funded Row -->
+                    <div class="form-group row">
+                        <label class="col-12 col-sm-3 col-form-label text-sm-right">H2020 / EU-funded</label>
+                        <div class="col-12 col-sm-8 col-lg-6">
+                            <label class="custom-control custom-checkbox custom-control-inline">
+                                <input type="checkbox" name="funding-eu" class="custom-control-input funding-eu" {% if user.extra.funding_eu %}checked{% endif %}>
+                                <span class="custom-control-label"></span>
+                            </label>
+                        </div>
+                    </div>
             </div>
 
                 </div>
@@ -234,7 +269,9 @@ function handleAjaxFail(jqXHR, textStatus) {
 function onUserOkButtonClick() {
     var frm = $('#user-form');
     var formData = new FormData(frm[0]);
+    formData.set("funding-eu", document.querySelector('.funding-eu').checked ? "true" : "false");
     var uploader = $('input[type=file]')[0];
+
     if ( uploader.files && uploader.files[0] ){
         formData.append('user-profile-image', uploader.files[0]);
     }
@@ -254,7 +291,7 @@ function onUserOkButtonClick() {
     }
 
     var ajaxContent = $.ajax({
-        url: "{{ url_for('api.update_user_form') }}",
+        url: "{{ url_for('api.update_user_form_extended') }}",
         type: "POST",
         data: formData,
         processData: false,
