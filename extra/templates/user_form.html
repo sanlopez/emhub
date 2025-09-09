@@ -148,27 +148,7 @@
 <!-- ============================================================== -->
 
 <script>
-    const passwordInput = document.getElementById("user-password");
-    const togglePassword = document.getElementById("togglePassword");
 
-    togglePassword.addEventListener("change", function () {
-      if (this.checked) {
-        passwordInput.type = "text";
-      } else {
-        passwordInput.type = "password";
-      }
-    });
-
-    const repeatedPasswordInput = document.getElementById("user-repeat-password");
-    const toggleRepeatedPassword = document.getElementById("toggleRepeatedPassword");
-
-    toggleRepeatedPassword.addEventListener("change", function () {
-      if (this.checked) {
-        repeatedPasswordInput.type = "text";
-      } else {
-        repeatedPasswordInput.type = "password";
-      }
-    });
 
 (function(window, document, $, undefined) {
 "use strict";
@@ -195,6 +175,28 @@
     });
 
     $('select').selectpicker();
+
+    const passwordInput = document.getElementById("user-password");
+    const togglePassword = document.getElementById("togglePassword");
+
+    togglePassword.addEventListener("change", function () {
+      if (this.checked) {
+        passwordInput.type = "text";
+      } else {
+        passwordInput.type = "password";
+      }
+    });
+
+    const repeatedPasswordInput = document.getElementById("user-repeat-password");
+    const toggleRepeatedPassword = document.getElementById("toggleRepeatedPassword");
+
+    toggleRepeatedPassword.addEventListener("change", function () {
+      if (this.checked) {
+        repeatedPasswordInput.type = "text";
+      } else {
+        repeatedPasswordInput.type = "password";
+      }
+    });
 
 })(window, document, window.jQuery);
 
