@@ -57,17 +57,32 @@ class CNBSessionTaskHandler(TaskHandler):
 
 
     def process(self):
-        # try:
-        if self.action == 'monitor':
-            return self.monitor()
-        elif self.action == 'otf':
-            return self.otf()
-        elif self.action == 'copy_to_irods':
-            return self.copy_to_irods()
-        raise Exception(f"Unknown action {self.action}")
-        # except Exception as e:
-        #     self.update_task({'error': str(e), 'done': 1})
-        #     self.stop()
+        try:
+            if self.action == 'monitor':
+                return self.monitor()
+            elif self.action == 'otf':
+                return self.otf()
+            elif self.action == 'copy_to_irods':
+                return self.copy_to_irods()
+            elif self.action == 'save_session_info':
+                return self.save_session_info()
+            raise Exception(f"Unknown action {self.action}")
+        except Exception as e:
+            self.update_task({'error': str(e), 'done': 1})
+            self.stop()
+
+    def save_session_info(self):
+        # save session folder names to make it easier to be copy-pasted from EPU
+        session_path = os.path.join(self.session['acquisition']['raw_path'], 'SESSION_Creation')
+        if not os.path.exists(session_path):
+            os.mkdir(session_path)
+        with open(os.path.join(session_path, 'session_clipboard.txt'), 'a') as file:
+            file.write(f'{self.session["name"]}_ATLAS\n')
+            for i in range(1, 13):
+                file.write(f'{self.session["name"]}_DATA_{i:02}\n')
+
+        self.update_task({'done': 1})
+        self.stop()
 
     def monitor(self):
         # update raw path
